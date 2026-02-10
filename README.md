@@ -1,4 +1,3 @@
-Below is a complete, production‑ready **README.md** you can drop into your repo. It’s optimized for a **local NVIDIA workstation** hosting **Ollama** and a small set of **LLM components** via **Docker Compose**. I’ve included clear setup steps, environment variables, security notes, health checks, and optional add‑ons (Open WebUI, text-generation-webui, API gateway, and metrics). Adjust names/ports to match your repo.
 
 ***
 
