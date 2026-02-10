@@ -1,0 +1,46 @@
+
+name: local-llm
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    environment:
+      - OLLAMA_HOST=${OLLAMA_HOST:-0.0.0.0}
+    volumes:
+      - ollama_models:${OLLAMA_MODELS:-/data/ollama}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
+    runtime: nvidia
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
+    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_AUTH=True
+      - WEBUI_ADMIN_USER=${WEBUI_ADMIN_USER:-admin}
+      - WEBUI_ADMIN_PASS=${WEBUI_ADMIN_PASS:-change-me}
+    ports:
+      - "${WEBUI_PORT:-3000}:8080"
+    volumes:
+      - webui_data:/app/backend/data
+
+volumes:
+  ollama_models:
+  webui_data:
